@@ -1,169 +1,62 @@
-{\rtf1\ansi\ansicpg1252\cocoartf2868
-\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
-{\colortbl;\red255\green255\blue255;}
-{\*\expandedcolortbl;;}
-\paperw11900\paperh16840\margl1440\margr1440\vieww25400\viewh15280\viewkind0
-\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+# LionVision AI
 
-\f0\fs24 \cf0 # \uc0\u55358 \u56705  Lion Face Classification Project\
-\
-## Overview\
-\
-The Lion Face Classification Project is a deep learning computer vision system designed to identify individual lions from images.\
-\
-The system uses a Convolutional Neural Network (CNN) with transfer learning to classify lion faces into specific identities.\
-\
-This project demonstrates practical applications of deep learning in wildlife monitoring, conservation, and animal identification.\
-\
----\
-\
-## Problem Type\
-\
-- Learning Type: Supervised Learning\
-- Category: Multi-Class Classification\
-- Goal: Identify which lion appears in an image.\
-\
-Each image belongs to exactly one lion identity, making it a multi-class classification problem.\
-\
----\
-\
-## Dataset Structure\
-\
-The dataset is organized in the following structure:\
-\
-dataset/\
-\
-\
-Each folder represents a class corresponding to a specific lion.\
-\
-Recommended dataset size:\
-- 50\'96200 images per lion\
-\
-Images should clearly contain the lion's face.\
-\
----\
-\
-## Model Type\
-\
-This project uses **Transfer Learning** with a pretrained Convolutional Neural Network.\
-\
-Possible pretrained models:\
-- MobileNetV2\
-- ResNet\
-- EfficientNet\
-\
-Benefits of transfer learning:\
-- Faster training\
-- Better performance with smaller datasets\
-- Utilizes knowledge from ImageNet\
-\
----\
-\
-## Model Architecture\
-\
-Input Image (224x224x3)\
-\
-Pretrained CNN Base\
-\
-Global Average Pooling\
-\
-Dense Layer (128 neurons, ReLU)\
-\
-Dropout Layer (0.3)\
-\
-Output Layer (Softmax)\
-\
----\
-\
-## Activation Functions\
-\
-Hidden Layers:\
-- ReLU (Rectified Linear Unit)\
-\
-Output Layer:\
-- Softmax\
-\
-Softmax converts model outputs into probabilities where the total equals 1.\
-\
----\
-\
-## Loss Function\
-\
-Categorical Cross-Entropy\
-\
-Used because this is a multi-class classification problem.\
-\
-It measures how far predictions are from the correct class.\
-\
----\
-\
-## Optimizer\
-\
-Adam Optimizer\
-\
-Advantages:\
-- Adaptive learning rate\
-- Fast convergence\
-- Works well for deep learning tasks\
-\
----\
-\
-## Regularization Techniques\
-\
-To prevent overfitting the model uses:\
-\
-- Dropout (0.3)\
-- Data augmentation\
-\
-Data augmentation includes:\
-- Rotation\
-- Zoom\
-- Horizontal flipping\
-\
----\
-\
-## Evaluation Metrics\
-\
-The model is evaluated using:\
-\
-- Accuracy\
-- Precision\
-- Recall\
-- Confusion Matrix\
-\
-These metrics help measure model performance across different lion classes.\
-\
----\
-\
-## Advanced Version (Future Improvement)\
-\
-A more scalable solution is **Face Recognition using embeddings**.\
-\
-Instead of classification:\
-\
-1. CNN extracts an embedding vector\
-2. Embeddings are stored in a database\
-3. New images are compared using distance metrics\
-\
-Distance metrics:\
-- Euclidean Distance\
-- Cosine Similarity\
-\
-This approach is commonly used in professional face recognition systems.\
-\
----\
-\
-## Applications\
-\
-- Wildlife monitoring\
-- Lion population tracking\
-- Animal identification systems\
-- Conservation research\
-- Camera trap automation\
-\
----\
-\
-## Author\
-\
-Prasuldev\
-AI / Data Science Project}
+LionVision AI is a Streamlit app for classifying wildlife photos. Drag in a JPEG,
+PNG or WebP file (up to 20 MB), preview it, then select **Classify photo**. With
+compatible model weights installed, the app returns **Lion** or **Not a lion**
+and the winning class's softmax score.
+
+## Run locally
+
+Use Python 3.11 or 3.13. Open the repository folder in VS Code and run these
+commands in its terminal (macOS or Linux).
+
+```sh
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install -r requirements.txt
+python -m streamlit run app.py --server.address 127.0.0.1
+```
+
+Open [LionVision AI](http://localhost:8501).
+
+## Enable predictions
+
+Put your trained `lion_classifier.pth` beside `app.py`, or set
+`LIONVISION_MODEL_PATH` to its full path before starting Streamlit. Model weights
+and training photos live outside Git. A checkout without a checkpoint supports
+uploads and previews and shows that inference is unavailable.
+
+Use a trusted PyTorch ResNet-18 state dictionary produced by the existing
+`lionvision.py` training script. The app uses CPU inference and matches training
+preprocessing by resizing RGB images to 224 × 224 and converting pixels to
+tensors. The original `ImageFolder` class order is `lions`, then `not_lions`.
+
+## Train with your own images
+
+Place labeled photos in the following folders. Keep the validation images
+separate from the training images.
+
+```text
+data/
+  train/
+    lions/
+    not_lions/
+  val/
+    lions/
+    not_lions/
+```
+
+Run `python lionvision.py` from the repository root. The script downloads
+ImageNet initialization weights if they are absent, prints validation accuracy,
+and saves `lion_classifier.pth`. It then attempts an example prediction using
+`data/train/lions/lion1.jpg`. Set `test_image` in the script to an existing
+photo if that sample path is absent.
+
+## Model scope
+
+The current checkpoint classifies the whole image. Face localization and
+individual lion identification would require suitable labeled data and a
+different model. The confidence score is uncalibrated, and the app's smoke
+tests do not establish accuracy on new photos.
+
+Created by Prasuldev.
