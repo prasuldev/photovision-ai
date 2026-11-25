@@ -1,14 +1,17 @@
-# LionVision AI
+# PhotoVision AI
 
-LionVision AI is a Streamlit app for classifying wildlife photos. Drag in a JPEG,
-PNG or WebP file (up to 20 MB), preview it, then select **Classify photo**. With
-compatible model weights installed, the app returns **Lion** or **Not a lion**
-and the winning class's softmax score.
+Upload a photo once and choose how to analyze it in Streamlit.
+
+| Mode | Result | Pretrained model |
+| --- | --- | --- |
+| Describe the photo (default) | A short English description of the scene | [Salesforce BLIP base](https://huggingface.co/Salesforce/blip-image-captioning-base) |
+| Find objects | Labeled boxes and scores for supported objects above 45% model confidence | [Torchvision SSDLite trained on COCO](https://docs.pytorch.org/vision/stable/models/generated/torchvision.models.detection.ssdlite320_mobilenet_v3_large.html) |
+| Identify the main subject | The highest-scoring category and its score | [Torchvision ResNet-18 trained on ImageNet](https://docs.pytorch.org/vision/stable/models/generated/torchvision.models.resnet18.html) |
 
 ## Run locally
 
-Use Python 3.11 or 3.13. Open the repository folder in VS Code and run these
-commands in its terminal (macOS or Linux).
+Open the repository folder in VS Code. Use Python 3.11 or 3.13, then run these
+commands in the terminal (macOS or Linux).
 
 ```sh
 python3 -m venv .venv
@@ -17,46 +20,27 @@ python -m pip install -r requirements.txt
 python -m streamlit run app.py --server.address 127.0.0.1
 ```
 
-Open [LionVision AI](http://localhost:8501).
+Open [PhotoVision AI](http://127.0.0.1:8501). Drag in a JPEG, PNG, or WebP
+file up to 20 MB, choose a mode, and select **Analyze photo**. You can switch
+modes without uploading the image again.
 
-## Enable predictions
+Each model downloads its weights on first use, then reuses the local cache.
+The description model is roughly 1 GB, so allow extra time and disk space for
+that first download. Inference runs on the server's CPU. With the command
+above, the server runs on your computer, and model downloads do not include
+your photos. No API key is required.
 
-Put your trained `lion_classifier.pth` beside `app.py`, or set
-`LIONVISION_MODEL_PATH` to its full path before starting Streamlit. Model weights
-and training photos live outside Git. A checkout without a checkpoint supports
-uploads and previews and shows that inference is unavailable.
+## Interpreting results
 
-Use a trusted PyTorch ResNet-18 state dictionary produced by the existing
-`lionvision.py` training script. The app uses CPU inference and matches training
-preprocessing by resizing RGB images to 224 × 224 and converting pixels to
-tensors. The original `ImageFolder` class order is `lions`, then `not_lions`.
+The object detector and subject classifier use the categories their models were
+trained on. The same photo can produce a useful caption and no detected boxes.
+Captions can omit details or misidentify objects, and model scores are
+uncalibrated.
 
-## Train with your own images
+## Original lion classifier
 
-Place labeled photos in the following folders. Keep the validation images
-separate from the training images.
-
-```text
-data/
-  train/
-    lions/
-    not_lions/
-  val/
-    lions/
-    not_lions/
-```
-
-Run `python lionvision.py` from the repository root. The script downloads
-ImageNet initialization weights if they are absent, prints validation accuracy,
-and saves `lion_classifier.pth`. It then attempts an example prediction using
-`data/train/lions/lion1.jpg`. Set `test_image` in the script to an existing
-photo if that sample path is absent.
-
-## Model scope
-
-The current checkpoint classifies the whole image. Face localization and
-individual lion identification would require suitable labeled data and a
-different model. The confidence score is uncalibrated, and the app's smoke
-tests do not establish accuracy on new photos.
+The original `lionvision.py` training script and `inference.py` checkpoint
+loader are still available. The earlier [LionVision AI README](https://github.com/prasuldev/lion-face-classification/blob/abce141fda85a868121e6036a1037229f0bf35d7/README.md)
+documents their binary checkpoint and dataset layout.
 
 Created by Prasuldev.
