@@ -40,7 +40,7 @@ uncalibrated.
 ## Original lion classifier
 
 The original `lionvision.py` training script and `inference.py` checkpoint
-loader are still available. The earlier [LionVision AI README](https://github.com/prasuldev/lion-face-classification/blob/abce141fda85a868121e6036a1037229f0bf35d7/README.md)
+loader are still available. The earlier [LionVision AI README](https://github.com/prasuldev/photovision-ai/blob/abce141fda85a868121e6036a1037229f0bf35d7/README.md)
 documents their binary checkpoint and dataset layout.
 
 Created by Prasuldev.
